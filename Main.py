@@ -6,3 +6,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 authentication = HTTPBasicAuth()
 app = Flask(__name__)
+
+@app.route('/')
+def index():
+    user_name=""
+    return render_template(
+        "home.html.jinja",user_name=user_name
+    )
+
+@app.route('/register')
+def register():
+    user_name1=""
+    return render_template(
+        "register.html.jinja",user_name=user_name1
+    )
