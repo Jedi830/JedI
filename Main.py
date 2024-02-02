@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 authentication = HTTPBasicAuth()
 app = Flask(__name__)
 
+
 @app.route('/')
 def index():
     user_name=""
@@ -14,9 +15,27 @@ def index():
         "home.html.jinja",user_name=user_name
     )
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    user_name1=""
-    return render_template(
-        "register.html.jinja",user_name=user_name1
-    )
+    if request.method == 'POST':
+        # Do this for every input in your form
+        username = request.form["username"]
+        password = request.form["password"]
+        bio = request.form["bio"]
+        birthday = request.form["birthday"]
+
+
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO `user` ('Email','Username','Password','bio' ) VALUES ('{username}', '{password}', '{bio}')")
+        cursor.close()
+        connection.commit()
+    
+    return render_template("register.html.jinja")
+
+connection = pymysql.connect(
+    database = "jdelacruz_erdiagram",
+    user = "jdelacruz",
+    password = "229770375",
+    host = "10.100.33.60",
+    cursorclass = pymysql.cursors.DictCursor,
+)
