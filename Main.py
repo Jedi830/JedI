@@ -6,13 +6,46 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 import flask_login
 
-authentication = HTTPBasicAuth()
 app = Flask(__name__)
+
+def connect_db():
+    return pymysql.connect(
+        host="10.100.33.60",
+        user="jdelacruz",
+        password="229770375",
+        database="jdelacruz_erdiagram",
+        cursorclass=pymysql.cursors.DictCursor,
+        autocommit=True
+)
+
+def get_db():
+    """Opens a new database connection per request"""
+    if not hasattr(g, db):
+        g.db = connect_db()
+    return g.db
+
+@app.teardown_appcontext
+def close_db(error):
+    login_manager = flask_login.LoginManager()
+    login_manager.init_app(app)
+
 app.secret_key = "Jedaiah"
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
+class User:
+    is_authenticated = True
+    is_anonymous = False
+    is_active = True
 
+    def __init__(self, id, username):
+
+        self.username = username
+        self.id = id
+    
+    def get_id(self):
+
+        return str(self.id)
 
 @app.route('/')
 def index():
@@ -27,11 +60,10 @@ def register():
 
         username = request.form["username"]
         password = request.form["password"]
-        bio = request.form["bio"]
         cursor = get_db.cursor()
-        cursor.execute(f"INSERT INTO `Users` ('Email','Username','Password','bio' ) VALUES ('{username}', '{password}', '{bio}')")
+        cursor.execute(f"INSERT INTO `Users` (`Username`,`Password`) VALUES ('{username}', '{password}')")
         cursor.close()
-        connection.commit()
+        get_db.commit()
     
     return render_template("register.html.jinja")
 
@@ -53,33 +85,24 @@ def login():
         cursor.execute(f" Select * FROM `Users` WHERE `Username = `{username}`")
         User=cursor.fetchone()
         cursor.close()
-        connection.commit()
+        get_db.commit()
         if password==User["password"]:
             return redirect('/feed')
 
     return render_template("register.html.jinja")
 
-class User:
-    is_authenticated = True
-    is_anonymous = False
-    is_active = True
-
-    def __init__(self, id, username):
-
-        self.username = username
-        self.id = id
-    
-    def get_id(self):
-
-        return str(self.id)
 
 @login_manager.user_loader
 def load_user(user_id):
-    cursor = connection.cursor()
+    cursor = get_db.cursor()
 
-    cursor.execute("SELECT * FROM `users` WHERE `id` = " + str(user_id))
+    cursor.execute(f"(SELECT * FROM `users` WHERE `id` = {user_id})")
 
     result = cursor.fetchone()
+
+    cursor.close()
+
+    get_db.commit()
 
     if result is None:
         return None
