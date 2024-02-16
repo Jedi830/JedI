@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, g
 import pymysql
 from pprint import pprint as print
 from flask_httpauth import HTTPBasicAuth
