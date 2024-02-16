@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<link ref="/static/style.css">
+
+<style>
+* {
+  padding: 0%;
+  margin: 0%;
+  font-family: sans-serif;
+}
+.login-form {
+  position: absolute;
+  top: 50%;
+  Left: 50%;
+  transform: translate(-50%,-50%);
+  width: 350px;
+}
+.login-form h1 {
+  font-size: 40px;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 20px;
+}
+.login-form p {
+  font-size: 20px;
+  margin: 15px 0;
+}
+.login-form input {
+  font-size: 16px;
+  padding: 15px 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 5px;
+  outline: none;
+}
+.login-form button {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 20px 0;
+  padding: 10px 15px;
+  width: 50%;
+  border: 0;
+  border-radius: 5px;
+}
+.login-form button:hover {
+  color: lightgreen;
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="login-form">
+<h1>Login Form</h1>
+  <form action="#" method="post">
+  <p>Username:</p>
+  <input type="text" name="username" placeholder="User">
+  <p>Password:</p>
+  <input type="text" name="password" placeholder="Password">
+  <Button type="submit" >Login</Button>
+  </form>
+
+</div>
+
+
+</body>
+{{% if request.form['password'] == result['password']:
+    user = load_user(result['id'])
+
+    flask_login.login_user(user)
+
+    return redirect('/feed')
+
+%}}
+
+
+
+
+</html>
