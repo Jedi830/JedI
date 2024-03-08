@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request, redirect, g
 import pymysql
-from pprint import pprint as print
-from flask_httpauth import HTTPBasicAuth
-from werkzeug.security import generate_password_hash, check_password_hash
 
 import flask_login
 
 app = Flask(__name__)
+app.secret_key = "Jedaiah"
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
 
 def connect_db():
     return pymysql.connect(
@@ -20,18 +21,15 @@ def connect_db():
 
 def get_db():
     """Opens a new database connection per request"""
-    if not hasattr(g, db):
+    if not hasattr(g, "db"):
         g.db = connect_db()
     return g.db
 
 @app.teardown_appcontext
 def close_db(error):
-    login_manager = flask_login.LoginManager()
-    login_manager.init_app(app)
-
-app.secret_key = "Jedaiah"
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
+    '''Closes the database connection at the end of request.'''    
+    if hasattr(g, 'db'):
+        g.db.close()
 
 class User:
     is_authenticated = True
@@ -66,14 +64,6 @@ def register():
         get_db.commit()
     
     return render_template("register.html.jinja")
-
-connection = pymysql.connect(
-    database = "jdelacruz_erdiagram",
-    user = "jdelacruz",
-    password = "229770375",
-    host = "10.100.33.60",
-    cursorclass = pymysql.cursors.DictCursor,
-)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -124,25 +114,4 @@ def create_post():
 
     cursor.execute("INSERT INTO 'posts" ('descption', 'user_id'))
 
-def connect_db():
-    return pymysql.connect(
-        host="10.100.33.60",
-        user="jdelacruz",
-        password="229770375",
-        database="jdelacruz_erdiagram",
-        cursorclass=pymysql.cursors.DictCursor,
-        autocommit=True
-    )
-
-def get_db():
-    '''Opens a new database connection per request.'''        
-    if not hasattr(g, 'db'):
-        get_db = connect_db()
-    return get_db.cursor()    
-
-@app.teardown_appcontext
-def close_db(error):
-    '''Closes the database connection at the end of request.'''    
-    if hasattr(g, 'db'):
-        get_db.close() 
 
